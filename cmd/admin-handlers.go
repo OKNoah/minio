@@ -500,7 +500,6 @@ func (a adminAPIHandlers) HealHandler(w http.ResponseWriter, r *http.Request) {
 	// after 10s unless a response item comes in
 	keepConnLive := func(w http.ResponseWriter, respCh chan healResp) {
 		ticker := time.NewTicker(time.Second * 10)
-		defer ticker.Stop()
 		started := false
 	forLoop:
 		for {
@@ -529,6 +528,7 @@ func (a adminAPIHandlers) HealHandler(w http.ResponseWriter, r *http.Request) {
 				break forLoop
 			}
 		}
+		ticker.Stop()
 	}
 
 	// find number of disks in the setup
