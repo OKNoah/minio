@@ -9,9 +9,18 @@ ENV MINIO_UPDATE off
 ENV MINIO_ACCESS_KEY_FILE=access_key \
     MINIO_SECRET_KEY_FILE=secret_key
 
+# Fly/wormhole
+
+ENV FLY_LOCAL_ENDPOINT 127.0.0.1:9000
+ENV FLY_TOKEN fly_token
+
+ADD https://github.com/superfly/wormhole/releases/download/v0.5.36/wormhole_linux_amd64 /usr/bin/wormhole
+
+RUN chmod +x /usr/bin/wormhole
+
 WORKDIR /go/src/github.com/minio/
 
-COPY dockerscripts/docker-entrypoint.sh dockerscripts/healthcheck.sh /usr/bin/
+COPY dockerscripts/healthcheck.sh /usr/bin/
 
 RUN  \
      apk add --no-cache ca-certificates curl && \
@@ -24,11 +33,9 @@ RUN  \
 
 EXPOSE 9000
 
-ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
-
 VOLUME ["/data"]
 
 HEALTHCHECK --interval=30s --timeout=5s \
     CMD /usr/bin/healthcheck.sh
 
-CMD ["minio"]
+CMD ["wormhole", "minio"]
